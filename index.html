@@ -1,4 +1,3 @@
-<!-- Complete HTML with Voice Buttons -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +5,7 @@
     <title>🌟 Cool Translator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        
+        /* Reset and Basic Styling */
         * {
             margin: 0;
             padding: 0;
@@ -201,7 +200,7 @@
     </style>
 </head>
 <body>
-<!-- Translator Container -->
+    <!-- Translator Container -->
     <div class="translator">
         <!-- Dark Mode Toggle -->
         <button class="dark-mode-toggle">🌙 Dark Mode</button>
@@ -245,10 +244,6 @@
 
         <!-- Copy Button -->
         <button class="copy-btn" id="copyBtn">📋 Copy</button>
-
-        <!-- Voice Buttons -->
-        <button class="voice-btn" id="voiceInputBtn">🎤 Speak</button>
-        <button class="voice-btn" id="voiceOutputBtn">🔊 Listen</button>
     </div>
 
     <!-- JavaScript -->
@@ -261,8 +256,6 @@
         const sourceLang = document.getElementById('sourceLang');
         const targetLang = document.getElementById('targetLang');
         const darkModeToggle = document.querySelector('.dark-mode-toggle');
-        const voiceInputBtn = document.getElementById('voiceInputBtn');
-        const voiceOutputBtn = document.getElementById('voiceOutputBtn');
 
         // Event Listener for Translate Button
         translateBtn.addEventListener('click', () => {
@@ -289,12 +282,16 @@
 
                 // Determine the language pair
                 let langPair;
-                if (source === 'auto') {
-                    // MyMemory API uses 'auto' for source language
+                if (source.toLowerCase() === 'auto') { // Ensure 'auto' is lowercase
                     langPair = `auto|${target}`;
                 } else {
                     langPair = `${source}|${target}`;
                 }
+
+                // Debugging Logs (Optional)
+                console.log(`Source Language: ${source}`);
+                console.log(`Target Language: ${target}`);
+                console.log(`Language Pair: ${langPair}`);
 
                 // Construct the API URL
                 const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=${langPair}`;
@@ -352,69 +349,6 @@
             if (event.key === 'Enter' && event.shiftKey) {
                 translateBtn.click();
             }
-        });
-
-        // Check for Speech Recognition API support
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition;
-
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.lang = 'en-US'; // Set default language
-
-            recognition.onstart = () => {
-                console.log('Voice recognition started. Speak into the microphone.');
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                inputText.value = transcript;
-                translateBtn.click();
-            };
-
-            recognition.onerror = (event) => {
-                console.error('Speech Recognition Error:', event.error);
-                alert('Voice recognition error: ' + event.error);
-            };
-
-            recognition.onend = () => {
-                console.log('Voice recognition ended.');
-            };
-        } else {
-            voiceInputBtn.disabled = true;
-            voiceInputBtn.textContent = '🎤 Not Supported';
-        }
-
-        // Event Listener for Voice Input Button
-        voiceInputBtn.addEventListener('click', () => {
-            if (recognition) {
-                recognition.start();
-            }
-        });
-
-        // Event Listener for Voice Output Button
-        voiceOutputBtn.addEventListener('click', () => {
-            const translatedText = outputText.textContent;
-            if (translatedText === '' || translatedText === 'Translated text will appear here...') {
-                alert('Nothing to speak!');
-                return;
-            }
-
-            const utterance = new SpeechSynthesisUtterance(translatedText);
-            // Set language for synthesis based on target language
-            const langMap = {
-                'en': 'en-US',
-                'es': 'es-ES',
-                'fr': 'fr-FR',
-                'de': 'de-DE',
-                'zh': 'zh-CN',
-                'ja': 'ja-JP',
-                'ru': 'ru-RU'
-                // Add more mappings as needed
-            };
-            utterance.lang = langMap[targetLang.value] || 'en-US';
-            window.speechSynthesis.speak(utterance);
         });
     </script>
 </body>
