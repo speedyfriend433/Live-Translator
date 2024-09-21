@@ -277,26 +277,27 @@
                 translateBtn.disabled = true;
                 translateBtn.textContent = 'Translating...';
 
-                const response = await fetch('https://libretranslate.de/translate', {
+                const response = await fetch('https://translate.argosopentech.com/translate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         q: text,
-                        source: source,
+                        source: source === 'auto' ? 'auto' : source,
                         target: target,
                         format: "text"
                     })
                 });
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Translation failed.');
+                }
+
                 const data = await response.json();
 
-                if (data.error) {
-                    outputText.textContent = 'Error: ' + data.error;
-                } else {
-                    outputText.textContent = data.translatedText;
-                }
+                outputText.textContent = data.translatedText;
             } catch (error) {
-                outputText.textContent = 'An error occurred. Please try again.';
+                outputText.textContent = 'Error: ' + error.message;
                 console.error('Translation Error:', error);
             } finally {
                 translateBtn.disabled = false;
